@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.gradle.PluginManager
 class KotlinPluginManager(override val project: Project) : PluginManager<KotlinPluginWrapper> {
 
   override fun configure() {
-    val extension = project.extensions.findByName("dps") as KotlinBoolean
+    val extension = project.extensions.findByName("dps") as DpsExtension
     if(extension.kotlin) {
       setKotlinCompileJvmVersion()
       addDependencies()
@@ -26,8 +26,10 @@ class KotlinPluginManager(override val project: Project) : PluginManager<KotlinP
   private fun addDependencies() {
     project.dependencies.add("implementation", "org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     project.dependencies.add("implementation", "org.jetbrains.kotlin:kotlin-reflect")
+    project.dependencies.add("implementation", "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.1")
 
     project.dependencies.add("testImplementation", "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
   }
 
 }

@@ -55,7 +55,7 @@ dependencies {
   implementation(kotlin("stdlib-jdk8"))
   implementation(kotlin("reflect"))
 
-  implementation("org.springframework.boot:spring-boot-gradle-plugin:2.3.2.RELEASE")
+  implementation("org.springframework.boot:spring-boot-gradle-plugin:2.3.3.RELEASE")
   implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
   implementation("io.spring.dependency-management:io.spring.dependency-management.gradle.plugin:1.0.10.RELEASE")
   implementation("org.owasp:dependency-check-gradle:5.3.2.1")

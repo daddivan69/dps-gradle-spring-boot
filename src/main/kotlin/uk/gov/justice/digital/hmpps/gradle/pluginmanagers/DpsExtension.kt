@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.gradle.pluginmanagers
 
-open class KotlinBoolean {
+open class DpsExtension {
 
-  var kotlin: Boolean = false
+  var kotlin: Boolean = true
 }

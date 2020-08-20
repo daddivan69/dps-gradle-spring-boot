@@ -7,7 +7,8 @@ import uk.gov.justice.digital.hmpps.gradle.configmanagers.BaseConfigManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.DependencyCheckPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.DependencyManagementPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.GitPropertiesPluginManager
-import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.KotlinBoolean
+import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.DpsExtension
+import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.JavaPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.KotlinPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.SpringBootPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.TestLoggerPluginManager
@@ -17,7 +18,7 @@ import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.VersionsPluginManager
 class DpsSpringBootPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
-    project.extensions.create("dps", KotlinBoolean::class.java)
+    project.extensions.create("dps", DpsExtension::class.java)
 
     val configManagers = configManagers(project)
 
@@ -29,11 +30,10 @@ class DpsSpringBootPlugin : Plugin<Project> {
   }
 
   private fun configManagers(project: Project): List<ConfigManager> {
-    return listOf(
+    val managers = mutableListOf(
         BaseConfigManager(project),
         AppInsightsConfigManager(project),
         PluginManager.from(::SpringBootPluginManager, project),
-        PluginManager.from(::KotlinPluginManager, project),
         PluginManager.from(::DependencyManagementPluginManager, project),
         PluginManager.from(::DependencyCheckPluginManager, project),
         PluginManager.from(::VersionsPluginManager, project),
@@ -41,6 +41,13 @@ class DpsSpringBootPlugin : Plugin<Project> {
         PluginManager.from(::UseLatestVersionsPluginManager, project),
         PluginManager.from(::TestLoggerPluginManager, project)
     )
+    val extension = project.extensions.findByName("dps") as DpsExtension
+    if(extension.kotlin) {
+      managers.add(PluginManager.from(::KotlinPluginManager, project))
+    } else {
+      managers.add(PluginManager.from(::JavaPluginManager, project))
+    }
+    return managers
   }
 
 }
