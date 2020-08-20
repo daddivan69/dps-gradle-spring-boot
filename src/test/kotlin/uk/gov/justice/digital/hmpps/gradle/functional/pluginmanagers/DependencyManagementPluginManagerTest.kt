@@ -45,6 +45,19 @@ class DependencyManagementPluginManagerTest : GradleBuildTest() {
         Arguments.of(javaProjectDetails(projectDir).copy(buildScript = wrongExplicitHibernateCoreVersionBuildFile())),
         Arguments.of(kotlinProjectDetails(projectDir).copy(buildScript = wrongExplicitHibernateCoreVersionBuildFile()))
     )
+
+    @Suppress("unused")
+    @JvmStatic
+    fun kotlinIncluded() = listOf(
+//        Arguments.of(javaProjectDetails(projectDir).copy(buildScript = kotlinIncludedBuildFile())),
+        Arguments.of(kotlinProjectDetails(projectDir).copy(buildScript = kotlinIncludedBuildFile()))
+    )
+    @Suppress("unused")
+    @JvmStatic
+    fun kotlinNotIncluded() = listOf(
+        Arguments.of(javaProjectDetails(projectDir).copy(buildScript = kotlinNotIncludedBuildFile()))
+//        Arguments.of(kotlinProjectDetails(projectDir).copy(buildScript = kotlinNotIncludedBuildFile()))
+    )
   }
 
   @ParameterizedTest
@@ -149,8 +162,39 @@ class DependencyManagementPluginManagerTest : GradleBuildTest() {
     assertThat(jarContainsHibernateCoreVersion(jarFile, "5.4.18")).isFalse()
   }
 
+  @ParameterizedTest
+  @MethodSource("kotlinIncluded")
+  fun `Kotlin included in project`(projectDetails: ProjectDetails) {
+    makeProject(projectDetails.copy())
+
+    val result = buildProject(projectDir, "bootJar")
+    assertThat(result.task(":bootJar")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+    val file = findJar(projectDir, projectDetails.projectName)
+    val jarFile = JarFile(file)
+    val list = jarFile.versionedStream().toArray()
+    assertThat(jarContainsKotlin(jarFile)).isTrue()
+  }
+
+  @ParameterizedTest
+  @MethodSource("kotlinNotIncluded")
+  fun `Kotlin not included in project`(projectDetails: ProjectDetails) {
+    makeProject(projectDetails.copy())
+
+    val result = buildProject(projectDir, "bootJar")
+    assertThat(result.task(":bootJar")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+    val file = findJar(projectDir, projectDetails.projectName)
+    val jarFile = JarFile(file)
+    val list = jarFile.versionedStream().toArray()
+    assertThat(jarContainsKotlin(jarFile)).isFalse()
+  }
+
   private fun jarContainsHibernateCoreVersion(jar: JarFile, version: String): Boolean =
       jar.getJarEntry("BOOT-INF/lib/hibernate-core-$version.Final.jar") != null
+
+  private fun jarContainsKotlin(jar: JarFile): Boolean =
+      jar.getJarEntry("BOOT-INF/lib/kotlin-stdlib-jdk8-1.3.72.jar") != null
 }
 
 private fun wrongTransitiveReactorNettyVersionBuildFile() = """
@@ -186,5 +230,25 @@ private fun wrongExplicitHibernateCoreVersionBuildFile() = """
     }
     dependencies {
       implementation("org.hibernate:hibernate-core:5.4.17.Final")
+    }
+  """.trimIndent()
+
+private fun kotlinIncludedBuildFile() = """
+    plugins {
+    id("uk.gov.justice.hmpps.gradle-spring-boot") version "0.1"
+    }
+    
+    dps {
+    kotlin = true
+    }
+  """.trimIndent()
+
+private fun kotlinNotIncludedBuildFile() = """
+    plugins {
+    id("uk.gov.justice.hmpps.gradle-spring-boot") version "0.1"
+    }
+    
+    dps {
+    kotlin = false
     }
   """.trimIndent()

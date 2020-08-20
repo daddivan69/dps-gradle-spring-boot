@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.gradle.configmanagers.BaseConfigManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.DependencyCheckPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.DependencyManagementPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.GitPropertiesPluginManager
+import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.KotlinBoolean
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.KotlinPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.SpringBootPluginManager
 import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.TestLoggerPluginManager
@@ -16,6 +17,7 @@ import uk.gov.justice.digital.hmpps.gradle.pluginmanagers.VersionsPluginManager
 class DpsSpringBootPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
+    project.extensions.create("dps", KotlinBoolean::class.java)
 
     val configManagers = configManagers(project)
 
